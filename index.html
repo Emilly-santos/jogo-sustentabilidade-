@@ -4,48 +4,305 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>EcoQuiz - Jogo de Sustentabilidade</title>
-    <link rel="stylesheet" href="styles.css">
+    <style>
+        /* Estilos CSS */
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #e8f5e9;
+            color: #2e7d32;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            text-align: center;
+        }
+        
+        h1 {
+            color: #1b5e20;
+            margin-bottom: 30px;
+        }
+        
+        .game-container {
+            background-color: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        
+        .card {
+            display: none;
+            padding: 20px;
+        }
+        
+        .card.active {
+            display: block;
+        }
+        
+        .question {
+            font-size: 20px;
+            margin-bottom: 20px;
+            min-height: 60px;
+        }
+        
+        .options {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .option {
+            background-color: #4caf50;
+            color: white;
+            border: none;
+            padding: 12px;
+            border-radius: 5px;
+            cursor: pointer;
+            text-align: left;
+            transition: background-color 0.3s;
+        }
+        
+        .option:hover {
+            background-color: #388e3c;
+        }
+        
+        .option.correct {
+            background-color: #81c784;
+        }
+        
+        .option.incorrect {
+            background-color: #e57373;
+        }
+        
+        .feedback {
+            font-size: 18px;
+            margin: 20px 0;
+            min-height: 50px;
+            padding: 10px;
+            border-radius: 5px;
+            background-color: #f1f8e9;
+        }
+        
+        .btn {
+            background-color: #2e7d32;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s;
+        }
+        
+        .btn:hover {
+            background-color: #1b5e20;
+        }
+        
+        .progress {
+            height: 8px;
+            background-color: #c8e6c9;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            overflow: hidden;
+        }
+        
+        .progress-bar {
+            height: 100%;
+            background-color: #4caf50;
+            width: 0%;
+            transition: width 0.5s;
+        }
+        
+        .score {
+            font-size: 18px;
+            font-weight: bold;
+            margin: 10px 0;
+        }
+        
+        .eco-tips {
+            margin-top: 30px;
+            text-align: left;
+            background-color: #f1f8e9;
+            padding: 15px;
+            border-radius: 5px;
+        }
+        
+        .final-message {
+            font-size: 20px;
+            margin: 20px 0;
+            font-weight: bold;
+        }
+    </style>
 </head>
 <body>
-    <div id="game-container">
+    <div class="game-container">
         <h1>🌱 EcoQuiz - Jogo de Sustentabilidade 🌱</h1>
         
-        <div id="start-screen">
+        <!-- Tela inicial -->
+        <div id="start-screen" class="card active">
             <p>Teste seus conhecimentos sobre sustentabilidade e aprenda como proteger nosso planeta!</p>
-            <p>O jogo contém 10 perguntas. Para cada resposta correta, você ganha 10 pontos.</p>
-            <button id="start-btn" class="btn">Começar Jogo</button>
+            <p>O jogo contém perguntas sobre ecologia, reciclagem e hábitos sustentáveis.</p>
+            <button class="btn" onclick="startGame()">Começar Jogo</button>
         </div>
         
-        <div id="quiz-screen" style="display: none;">
-            <div id="progress">
-                <div id="progress-bar"></div>
+        <!-- Tela do quiz -->
+        <div id="quiz-screen" class="card">
+            <div class="progress">
+                <div class="progress-bar" id="progress-bar"></div>
             </div>
-            <div id="score">Pontuação: 0</div>
-            <div id="question"></div>
-            <div id="options"></div>
-            <div id="result"></div>
-            <button id="next-btn" class="btn" style="display: none;">Próxima Pergunta</button>
+            <div class="score" id="score">Pontuação: 0</div>
+            <div class="question" id="question"></div>
+            <div class="options" id="options"></div>
+            <div class="feedback" id="feedback"></div>
+            <button class="btn" id="next-btn" onclick="nextQuestion()" style="display: none;">Próxima Pergunta</button>
         </div>
         
-        <div id="end-screen">
+        <!-- Tela final -->
+        <div id="end-screen" class="card">
             <h2>Parabéns! Você completou o EcoQuiz!</h2>
-            <p id="final-score"></p>
-            <p id="final-message"></p>
-            <button id="restart-btn" class="btn">Jogar Novamente</button>
+            <div class="final-message" id="final-message"></div>
+            <div class="score" id="final-score"></div>
+            <button class="btn" onclick="restartGame()">Jogar Novamente</button>
             
-            <div id="eco-tips">
+            <div class="eco-tips">
                 <h3>Dicas Sustentáveis para o Dia a Dia:</h3>
                 <ul>
-                    <li>Reduza o consumo de plásticos descartáveis</li>
-                    <li>Separe o lixo para reciclagem</li>
-                    <li>Prefira produtos locais e sazonais</li>
-                    <li>Economize água e energia</li>
-                    <li>Use transporte público, bicicleta ou caminhe</li>
+                    <li>Use sacolas reutilizáveis em vez de plásticas</li>
+                    <li>Separe o lixo reciclável do orgânico</li>
+                    <li>Prefira produtos com menos embalagens</li>
+                    <li>Desligue aparelhos eletrônicos quando não estiver usando</li>
+                    <li>Conserte em vez de descartar</li>
                 </ul>
             </div>
         </div>
     </div>
 
-    <script src="script.js"></script>
+    <script>
+        // Variáveis do jogo
+        let currentQuestion = 0;
+        let score = 0;
+        const questions = [
+            {
+                question: "Qual dessas ações ajuda mais a reduzir o desperdício de água?",
+                options: [
+                    "Tomar banhos mais curtos",
+                    "Lavar o carro com mangueira",
+                    "Deixar a torneira aberta ao escovar os dentes",
+                    "Usar a máquina de lavar com poucas roupas"
+                ],
+                correct: 0,
+                explanation: "Tomar banhos mais curtos pode economizar até 100 litros de água por banho!"
+            },
+            {
+                question: "Qual material NÃO deve ser colocado no lixo reciclável comum?",
+                options: [
+                    "Garrafas PET",
+                    "Pilhas e baterias",
+                    "Jornais e revistas",
+                    "Latas de alumínio"
+                ],
+                correct: 1,
+                explanation: "Pilhas e baterias contêm metais pesados e devem ser descartadas em pontos de coleta específicos."
+            },
+            {
+                question: "O que significa o símbolo da 'seta em loop' nos produtos?",
+                options: [
+                    "Que o produto é biodegradável",
+                    "Que a embalagem é reciclável",
+                    "Que o produto é orgânico",
+                    "Que é feito de material reciclado"
+                ],
+                correct: 1,
+                explanation: "O símbolo de setas em triângulo indica que a embalagem é reciclável, não necessariamente que já foi reciclada."
+            }
+        ];
+
+        // Funções do jogo
+        function startGame() {
+            document.getElementById('start-screen').classList.remove('active');
+            document.getElementById('quiz-screen').classList.add('active');
+            showQuestion();
+        }
+
+        function showQuestion() {
+            const question = questions[currentQuestion];
+            document.getElementById('question').textContent = question.question;
+            
+            const optionsDiv = document.getElementById('options');
+            optionsDiv.innerHTML = '';
+            
+            question.options.forEach((option, index) => {
+                const button = document.createElement('button');
+                button.textContent = option;
+                button.className = 'option';
+                button.onclick = () => checkAnswer(index);
+                optionsDiv.appendChild(button);
+            });
+            
+            document.getElementById('progress-bar').style.width = `${(currentQuestion / questions.length) * 100}%`;
+            document.getElementById('next-btn').style.display = 'none';
+            document.getElementById('feedback').textContent = '';
+        }
+
+        function checkAnswer(selectedIndex) {
+            const question = questions[currentQuestion];
+            const options = document.querySelectorAll('.option');
+            
+            options.forEach(option => {
+                option.disabled = true;
+            });
+            
+            options[question.correct].classList.add('correct');
+            
+            if (selectedIndex !== question.correct) {
+                options[selectedIndex].classList.add('incorrect');
+                document.getElementById('feedback').textContent = `Ops! ${question.explanation}`;
+            } else {
+                score += 10;
+                document.getElementById('score').textContent = `Pontuação: ${score}`;
+                document.getElementById('feedback').textContent = `Correto! ${question.explanation}`;
+            }
+            
+            document.getElementById('next-btn').style.display = 'block';
+        }
+
+        function nextQuestion() {
+            currentQuestion++;
+            
+            if (currentQuestion < questions.length) {
+                showQuestion();
+            } else {
+                endGame();
+            }
+        }
+
+        function endGame() {
+            document.getElementById('quiz-screen').classList.remove('active');
+            document.getElementById('end-screen').classList.add('active');
+            
+            document.getElementById('final-score').textContent = `Pontuação final: ${score}/${questions.length * 10}`;
+            
+            let message;
+            const percentage = (score / (questions.length * 10)) * 100;
+            
+            if (percentage >= 80) {
+                message = "Excelente! Você é um expert em sustentabilidade!";
+            } else if (percentage >= 50) {
+                message = "Bom trabalho! Continue aprendendo sobre ecologia.";
+            } else {
+                message = "Você pode melhorar! A sustentabilidade é importante para todos nós.";
+            }
+            
+            document.getElementById('final-message').textContent = message;
+        }
+
+        function restartGame() {
+            currentQuestion = 0;
+            score = 0;
+            document.getElementById('score').textContent = `Pontuação: ${score}`;
+            document.getElementById('end-screen').classList.remove('active');
+            document.getElementById('start-screen').classList.add('active');
+        }
+    </script>
 </body>
+</html>
 </html>
